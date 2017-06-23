@@ -18,7 +18,26 @@ namespace WinTail
 
         protected override void OnReceive(object message)
         {
-            throw new NotImplementedException();
+            var msg = message as string;
+
+            if (string.IsNullOrWhiteSpace(msg))
+            {
+                _consoleWriterActor.Tell(new Messages.InputError("No input received."));
+            }
+            else
+            {
+                bool valid = IsValid(msg);
+                if (valid)
+                {
+                    _consoleWriterActor.Tell(new Messages.InputSuccess("Thank you. Message was success."));
+                }
+                else
+                {
+                    _consoleWriterActor.Tell(new Messages.ValidationError("Invalid: input had odd number of characters."));
+                }
+            }
+
+            Sender.Tell(new Messages.ContinueProcessing());
         }
 
         private bool IsValid(string message)
